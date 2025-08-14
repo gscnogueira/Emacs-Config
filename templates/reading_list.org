@@ -1,0 +1,10 @@
+* TOREAD %^{Reading list entry}
+:PROPERTIES:
+:CREATED_AT: %T
+:END:
+- Fonte :: %^{Link for entry}
+- Motivação :: %^{Por que você quer ler isso?}
+
+%?
+
+
