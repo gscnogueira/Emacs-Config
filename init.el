@@ -1,15 +1,17 @@
 ;; =================================
 ;; Author: Gabriel da S. C. Nogueira
 ;; GitHub: gscnogueira
-;; Emacs Version: 30.1
+;; Emacs Version: 29.3
 ;; =================================
+
+(eval-when-compile (require 'use-package))
+
+(require 'package)
+(add-to-list 'package-archives
+	     '("melpa" . "http://melpa.org/packages/") t)
 
 (use-package emacs
   :init
-  (eval-when-compile (require 'use-package))
-  (add-to-list 'package-archives
-	       '("melpa" . "http://melpa.org/packages/") t)
-
   (add-to-list 'default-frame-alist '(font . "JetBrains Mono-15"))
   :hook
   (prog-mode . display-line-numbers-mode)
@@ -39,6 +41,7 @@
   )
 
 (use-package modus-themes
+  :ensure t
   :init
   (require-theme 'modus-themes)
   :config
@@ -104,6 +107,7 @@
   :defer t)
 
 (use-package which-key
+  :ensure t
   :config
   (which-key-mode t))
 
@@ -115,8 +119,9 @@
   (evil-want-keybinding nil)
   :config
   (evil-mode t)
-  ((evil-set-initial-state  'Info-mode 'emacs)
-   (evil-set-initial-state 'dired-mode 'emacs)))
+  (evil-set-initial-state 'Info-mode 'emacs)
+  (evil-set-initial-state 'dired-mode 'emacs)
+  )
 
 (use-package evil-collection
   :ensure t
