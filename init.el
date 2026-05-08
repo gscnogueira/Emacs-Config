@@ -64,6 +64,9 @@
   (dired-create-destination-dirs t)
   :hook
   (dired-mode . dired-hide-details-mode)
+  (dired-mode . dired-omit-mode)
+  :config
+  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
   )
 
 (use-package org
