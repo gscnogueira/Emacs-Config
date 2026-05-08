@@ -1,0 +1,37 @@
+# Pacotes instalados (regeneráveis via use-package/package-install)
+elpa/
+
+# Bytecode nativo compilado
+eln-cache/
+
+# Caches de runtime
+.cache/
+url/
+auto-save-list/
+multisession/
+transient/
+
+# Backups e arquivos temporários do Emacs
+*~
+\#*\#
+.\#*
+
+# Gerado pelo sistema Custom do Emacs
+custom.el
+
+# Estado de sessão e conexões
+tramp
+.lsp-session-v1
+projects
+session.*
+
+# Org / org-roam
+.org-id-locations
+org-roam.db
+
+# Bookmarks e diary
+bookmarks
+diary
+
+# Outros arquivos de estado
+config.org~
