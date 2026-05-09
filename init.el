@@ -2,6 +2,8 @@
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
 
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
 (package-initialize)
 
 (unless package-archive-contents
@@ -25,24 +27,20 @@
   (global-visual-line-mode t)
   (column-number-mode t)
   (apropos-sort-by-scores t)
-  (custom-file
-  (expand-file-name "custom.el" user-emacs-directory)
-  )
 
-:config
-(setq-default left-margin-width 1) 
-;; Set left-margin-width to 0 on prog-mode
-(add-hook 'prog-mode-hook
-	  (function(lambda () (setq left-margin-width 0)))
-	  )
-(load custom-file)
-(setq make-backup-files nil)
-(setq frame-resize-pixelwise t)
-(setq window-resize-pixelwise t)
-(setq initial-major-mode 'org-mode) ;; org mode for initial buffer
-(setq native-comp-async-report-warnings-errors 'silent)
-(winner-mode 1)
-
+  :config
+  (setq-default left-margin-width 1) 
+  ;; Set left-margin-width to 0 on prog-mode
+  (add-hook 'prog-mode-hook
+	    (function(lambda () (setq left-margin-width 0)))
+	    )
+  (when (file-exists-p custom-file) (load custom-file nil 'nomessage))
+  (setq make-backup-files nil)
+  (setq frame-resize-pixelwise t)
+  (setq window-resize-pixelwise t)
+  (setq initial-major-mode 'org-mode) ;; org mode for initial buffer
+  (setq native-comp-async-report-warnings-errors 'silent)
+  (winner-mode 1)
 )
 
 (use-package modus-themes
@@ -66,6 +64,7 @@
   (dired-mode . dired-hide-details-mode)
   (dired-mode . dired-omit-mode)
   :config
+  (require 'dired-x)
   (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
   )
 
@@ -73,7 +72,7 @@
   :hook (
          (org-mode . org-indent-mode)
          (org-agenda-mode . hl-line-mode)
-         (org-babel-after-execute . org-redisplay-inline-images)
+	 (org-babel-after-execute . org-redisplay-inline-images)
          )
   :bind
   (("C-c a" . org-agenda)
@@ -255,6 +254,7 @@
 
 (use-package copilot
   :ensure t
+  :if (executable-find "copilot-language-server")
   :hook (prog-mode . copilot-mode)
   :custom
   (copilot-server-executable "/home/gabriel-nogueira/.npm-global/bin/copilot-language-server")
@@ -262,7 +262,8 @@
   :bind (("C-c <tab>" . copilot-complete)
          :map copilot-completion-map
          ("C-c <return>" . copilot-accept-completion)
-         ("C-<tab>" . copilot-accept-completion-by-word)))
+         ("C-<tab>" . copilot-accept-completion-by-word))
+  )
 
 (use-package gptel
   :ensure t
@@ -307,9 +308,6 @@
   (python-mode . lsp)
   )
 
-(use-package docker-compose-mode
-  :ensure t)
-
 (use-package denote
   :ensure t
   :hook (dired-mode . denote-dired-mode)
@@ -322,6 +320,9 @@
   )
 
 (use-package dockerfile-mode
+  :ensure t)
+
+(use-package docker-compose-mode
   :ensure t)
 
 (use-package rainbow-delimiters
