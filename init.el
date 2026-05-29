@@ -336,6 +336,7 @@
    )
   :config
   (setq denote-directory (expand-file-name "~/notes"))
+  (denote-rename-buffer-mode 1)
   )
 
 (use-package dockerfile-mode
