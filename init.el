@@ -80,19 +80,31 @@
    ("C-c c" . org-capture))
   :custom
   (org-hide-emphasis-markers  t)
-
   (org-startup-with-inline-images t)
-
   (org-confirm-babel-evaluate nil)
 
   (org-todo-keywords
    '((sequence "TODO(t)" "BLOCKED(b@)" "|" "DONE(d)" "CANCELLED(c@)"))
+   )
+  (org-agenda-custom-commands
+   '(
+     ("t" "TODOs" 
+      ((agenda "") (todo ""))
+      ((org-agenda-tag-filter-preset '("-noagenda" "-fiocruz"))))
+     ("f" "Agenda + TODOs (com fiocruz)"
+      ((agenda "") (todo ""))
+      ((org-agenda-tag-filter-preset '("+fiocruz" "-noagenda"))
+       (org-agenda-clockreport-parameter-plist '(:scope agenda-with-archives :match "+fiocruz" :maxlevel 3))
+       )
+      )
+     )
    )
 
   (org-agenda-span 'day)
   (org-enforce-todo-dependencies t)
   (org-enforce-todo-checkbox-dependencies t)
   (org-hide-drawer-startup t)
+  (org-agenda-clockreport-parameter-plist '(:scope agenda-with-archives :maxlevel 3))
 
   :config
   (defun my/org-prettify-checkboxes ()
@@ -109,10 +121,9 @@
   (add-hook 'org-mode-hook 'variable-pitch-mode)
   (add-hook 'org-mode-hook #'my/org-prettify-checkboxes)
   (setq org-agenda-files '("~/org/agenda/"))
+  (setq org-agenda-tag-filter-preset '("-noagenda"))
   )
 
-
-(setq org-agenda-tag-filter-preset '("-noagenda"))
 
 (setq org-capture-templates
       '(
