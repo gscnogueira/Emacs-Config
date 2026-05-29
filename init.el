@@ -278,8 +278,14 @@
 (use-package gptel
   :ensure t
   :config
-  (setq gptel-model 'gpt-5.3-codex
-        gptel-backend (gptel-make-gh-copilot "Copilot"))
+  (setq gptel-model 'gemma4:26b
+        gptel-backend
+	(gptel-make-ollama "Ollama"             ;Any name of your choosing
+	  :host  "10.62.6.153:11434"     ;Where it's running
+	  :stream t                             ;Stream responses
+	  :models '(qwen3-coder:30b gemma4:26b))          ;List of models
+	;; (gptel-make-gh-copilot "Copilot")
+	)
   :bind
   ("C-c g r" . gptel-rewrite)
   ("C-c g a" . gptel-add)
