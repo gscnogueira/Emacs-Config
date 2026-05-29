@@ -346,3 +346,18 @@
   :hook
   (prog-mode . rainbow-delimiters-mode)
   )
+
+(use-package pdf-tools
+  :ensure t
+  :config
+  (pdf-tools-install)
+  )
+
+
+(use-package auctex
+  :ensure t
+  :hook ((LaTeX-mode . display-line-numbers-mode)
+         (LaTeX-mode . reftex-mode)
+         (LaTeX-mode . TeX-source-correlate-mode)
+	 (LaTeX-mode . flyspell-mode)
+	 ))
