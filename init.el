@@ -178,7 +178,7 @@
   :bind
   (:map vertico-map
 	;; Restores TAB default behaviour
-	("TAB" . vertico-directory-enter)
+	;; ("TAB" . vertico-directory-enter)
 	("C-<backspace>" . vertico-directory-delete-word)
 	)
   )
@@ -330,9 +330,12 @@
   :bind
   (
    ("C-c n n" . denote-open-or-create )
+   ("C-c n d" . denote-dired)
+   ("C-c n l" . denote-link-or-create)
    )
   :config
   (setq denote-directory (expand-file-name "~/notes"))
+  (setq denote-date-prompt-use-org-read-date t)
   (denote-rename-buffer-mode 1)
   )
 
