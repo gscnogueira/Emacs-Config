@@ -111,6 +111,11 @@
     (push '("[ ]" . "☐") prettify-symbols-alist)
     (push '("[X]" . "☑") prettify-symbols-alist)
     (push '("[-]" . "⊟") prettify-symbols-alist)
+    (push '("->" . ?⟶) prettify-symbols-alist)
+    (push '("<-" . ?←) prettify-symbols-alist)
+    (push '("<->" . ?↔) prettify-symbols-alist)
+    (push '("=>" . ?⇒) prettify-symbols-alist)
+    (push '("<=>" . ?⟺) prettify-symbols-alist)
     (prettify-symbols-mode 1))
 
   (set-face-attribute 'variable-pitch nil :family "Literata" :height 160)
