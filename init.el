@@ -131,30 +131,22 @@
 
 
 (setq org-capture-templates
-      '(
-        ("i" "Ideia" entry
-         (file+headline "~/org/agenda/doutorado.org" "Ideias")
-         "* %^{Título}\n:PROPERTIES:\n:CREATED: %U\n:END:\n%?"
-         )
-        ("l" "Tópicos para abordar na próxima reunião com o prof. Luís"
-         checkitem
-         (file+regexp "~/org/agenda/doutorado.org" "Reunião Luís")
-         "[ ] %?")
-        ("d" "Doutorado" entry
-         (file+headline "~/org/agenda/doutorado.org" "Tarefas")
-         "* TODO %^{Tarefa:}\n:PROPERTIES:\n:CREATED: %U\n:END:\n%?")
-        ("f" "Tarefa fiocruz" entry
-         (file+headline "~/org/agenda/fiocruz.org" "Tarefas")
-         "* TODO %^{Tarefa:}\n:PROPERTIES:\n:CREATED: %U\n:END:\n%?")
-	("D" "Disciplinas" entry
-	 (file+headline "~/org/agenda/disciplinas.org" "Tarefas")
-	 "* TODO %^{Tarefa:}\n:PROPERTIES:\n:CREATED: %U\n:END:\n%?")
-        ("F" "Tóipico de reunião (fiocruz)" entry
-         (file+headline "~/org/agenda/fiocruz.org" "Reuniões")
-         "* TODO %^{Tópico a ser discutido:}\n:PROPERTIES:\n:CREATED: %U\n:END:\n%?")
-	)
-      )
-      
+      '(("t" "Tarefa Doutorado" entry
+         (file+olp "~/org/agenda/doutorado.org" "Tarefas")
+         "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:END:")
+        ("d" "Disciplina" )
+        ("di" "IIA" entry
+         (file+olp "~/org/agenda/disciplinas.org" "Introdução à Inteligência Artificial")
+         "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:END:"
+         :clock-in t :clock-resume t)
+        ("dp" "PLN" entry
+         (file+olp "~/org/agenda/disciplinas.org" "Processamento de Linguagem Natural")
+         "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:END:"
+         :clock-in t :clock-resume t)
+        ("m" "Meeting" entry
+         (file+olp+datetree "~/org/agenda/meetings.org")
+         "* %^{Título}")))
+
 
 (use-package which-key
   :ensure t
