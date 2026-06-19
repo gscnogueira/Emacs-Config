@@ -301,14 +301,17 @@
 (use-package gptel
   :ensure t
   :config
-  (setq gptel-model 'gemma4:26b
-        gptel-backend
-	(gptel-make-ollama "Ollama"             ;Any name of your choosing
-	  :host  "10.62.6.153:11434"     ;Where it's running
-	  :stream t                             ;Stream responses
-	  :models '(qwen3-coder:30b gemma4:26b))          ;List of models
-	;; (gptel-make-gh-copilot "Copilot")
-	)
+
+  (gptel-make-ollama "Ollama"
+    :host  "10.62.6.153:11434"
+    :stream t
+    :models '(gemma4:26b qwen3-coder:30b))
+
+  (gptel-make-gh-copilot "Copilot")
+
+  (setq gptel-backend (gptel-get-backend "Copilot")
+	gptel-model 'gpt-4o)
+
   :bind
   ("C-c g r" . gptel-rewrite)
   ("C-c g a" . gptel-add)
