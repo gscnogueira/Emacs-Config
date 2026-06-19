@@ -2,6 +2,8 @@
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
 
+(add-to-list 'exec-path (expand-file-name "~/.npm-global/bin"))
+
 (package-initialize)
 
 (unless package-archive-contents
@@ -153,6 +155,29 @@
   :config
   (which-key-mode t))
 
+(use-package agent-shell
+    :ensure t
+    :ensure-system-package
+    (
+     (claude-agent-acp . "npm install -g @agentclientprotocol/claude-agent-acp"))
+    :bind
+    (("C-c s s" . agent-shell)
+     ("C-c s t" . agent-shell-toggle)
+     ("C-c s b" . agent-shell-switch-buffer)
+     ("C-c s n" . agent-shell-new-shell)
+     ("C-c s c" . agent-shell-prompt-compose)
+     :map agent-shell-diff-mode-map
+     ("a" . agent-shell-diff-accept-all))
+    :custom
+    (agent-shell-preferred-agent-config 'claude-code)
+    (agent-shell-header-style 'text)
+    (agent-shell-show-welcome-message nil)
+    (agent-shell-context-sources '(files region error))
+    :hook
+    (diff-mode . (lambda ()
+		   (when (string-match-p "\\*agent-shell-diff\\*" (buffer-name))
+		     (evil-emacs-state)))))
+
 (use-package evil
   :ensure t
   :init
@@ -163,6 +188,7 @@
   (evil-mode t)
   (evil-set-initial-state 'Info-mode 'emacs)
   (evil-set-initial-state 'dired-mode 'emacs)
+  (evil-set-initial-state 'agent-shell-mode 'emacs)
   )
 
 (use-package evil-collection
