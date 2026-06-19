@@ -380,7 +380,7 @@
 (use-package pdf-tools
   :ensure t
   :custom
-  (pdf-view-continuous t)
+  (pdf-view-continuous nil)
   :config
   (pdf-tools-install))
 
