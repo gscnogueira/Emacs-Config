@@ -35,3 +35,6 @@ diary
 
 # Outros arquivos de estado
 config.org~
+
+# Configurações locais (IPs, dados de máquina)
+local.el
