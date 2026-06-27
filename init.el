@@ -67,7 +67,7 @@
   :init
   (require-theme 'modus-themes)
   :config
-  (load-theme 'modus-vivendi)
+  (load-theme 'modus-vivendi t)
   :custom
   (modus-themes-italic-constructs t)
   (modus-themes-bold-constructs t)
@@ -162,7 +162,8 @@
   (evil-mode t)
   (evil-set-initial-state 'Info-mode 'emacs)
   (evil-set-initial-state 'dired-mode 'emacs)
-  (evil-set-initial-state 'agent-shell-mode 'emacs))
+  (evil-set-initial-state 'agent-shell-mode 'emacs)
+  (evil-set-initial-state 'vterm-mode 'emacs))
 
 (use-package evil-collection
   :ensure t
@@ -177,8 +178,8 @@
 
 (use-package vterm
   :ensure t
-  :config
-  (add-hook 'vterm-mode-hook 'turn-off-evil-mode))
+  :bind ("C-c t" . vterm)
+  )
 
 ;;; Org / Notes
 
@@ -198,11 +199,8 @@
   (org-agenda-custom-commands
    '(("t" "TODOs"
       ((agenda "") (todo ""))
-      ((org-agenda-tag-filter-preset '("-noagenda" "-fiocruz"))))
-     ("f" "Agenda + TODOs (com fiocruz)"
-      ((agenda "") (todo ""))
-      ((org-agenda-tag-filter-preset '("+fiocruz" "-noagenda"))
-       (org-agenda-clockreport-parameter-plist '(:scope agenda-with-archives :match "+fiocruz" :maxlevel 3))))))
+      ((org-agenda-tag-filter-preset '("-noagenda"))))
+     ))
   (org-agenda-span 'day)
   (org-enforce-todo-dependencies t)
   (org-enforce-todo-checkbox-dependencies t)
@@ -226,8 +224,8 @@
   (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
   (add-hook 'org-mode-hook 'variable-pitch-mode)
   (add-hook 'org-mode-hook #'my/org-prettify-checkboxes)
-  (setq org-agenda-files '("~/org/agenda/"))
-  (setq org-agenda-tag-filter-preset '("-noagenda")))
+  (setq org-agenda-files '("~/org/chatfiocruz/"))
+  )
 
 (use-package org-superstar
   :ensure t
@@ -376,3 +374,22 @@
 (use-package ledger-mode
   :defer t
   :ensure t)
+
+;;; Custom
+
+(defun my/org-new-fiocruz-sprint ()
+  (interactive)
+  (let* ((start    (org-read-date nil nil nil "Início do sprint: "))
+         (end      (org-read-date nil nil nil "Fim do sprint: "))
+         (title    (format "Sprint %s - %s" start end))
+         (filename (expand-file-name
+                    (format "sprint_%s_%s.org" start end)
+                    "~/org/chatfiocruz/")))
+    (find-file filename)
+    (when (= (buffer-size) 0)
+      (insert "#+title: " title "\n"
+              "#+CATEGORY: fiocruz\n\n"
+              "* Resumo da Reunião\n\n"
+              "* Tarefas\n\n"
+              "* Diário\n"))
+    (goto-char (point-min))))
