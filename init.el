@@ -5,7 +5,11 @@
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
 
-(unless package-archive-contents ; primeira instalação: baixa índice do MELPA
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+(package-initialize)
+
+(unless package-archive-contents
   (package-refresh-contents))
 
 (setq use-package-enable-imenu-support t) ; expõe cada pacote no imenu (C-x j)
@@ -27,7 +31,26 @@
   (global-visual-line-mode t)
   (column-number-mode t)
   (apropos-sort-by-scores t)
-  (custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+  :config
+  (setq-default left-margin-width 1) 
+  ;; Set left-margin-width to 0 on prog-mode
+  (add-hook 'prog-mode-hook
+	    (function(lambda () (setq left-margin-width 0)))
+	    )
+  (when (file-exists-p custom-file) (load custom-file nil 'nomessage))
+  (setq make-backup-files nil)
+  (setq frame-resize-pixelwise t)
+  (setq window-resize-pixelwise t)
+  (setq initial-major-mode 'org-mode) ;; org mode for initial buffer
+  (setq native-comp-async-report-warnings-errors 'silent)
+  (winner-mode 1)
+)
+
+(use-package modus-themes
+  :ensure t
+  :init
+  (require-theme 'modus-themes)
   :config
   (setq-default left-margin-width 1)
   (add-hook 'prog-mode-hook
@@ -48,7 +71,33 @@
   (dired-mode . dired-omit-mode)
   :config
   (require 'dired-x)
-  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$")))
+  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+  )
+
+(use-package org
+  :hook (
+         (org-mode . org-indent-mode)
+         (org-agenda-mode . hl-line-mode)
+	 (org-babel-after-execute . org-redisplay-inline-images)
+         )
+  :bind
+  (("C-c a" . org-agenda)
+   ("C-c c" . org-capture))
+  :custom
+  (org-hide-emphasis-markers  t)
+
+  (org-startup-with-inline-images t)
+
+  (org-confirm-babel-evaluate nil)
+
+  (org-todo-keywords
+   '((sequence "TODO(t)" "BLOCKED(b@)" "|" "DONE(d)" "CANCELLED(c@)"))
+   )
+
+  (org-agenda-span 'day)
+  (org-enforce-todo-dependencies t)
+  (org-enforce-todo-checkbox-dependencies t)
+  (org-hide-drawer-startup t)
 
 (use-package modus-themes
   :ensure t
@@ -335,9 +384,36 @@
 
 (use-package lsp-pyright
   :ensure t
-  :custom (lsp-pyright-langserver-command "pyright")
-  :hook
-  (python-mode . lsp))
+  :if (executable-find "copilot-language-server")
+  :hook (prog-mode . copilot-mode)
+  :custom
+  (copilot-server-executable "/home/gabriel-nogueira/.npm-global/bin/copilot-language-server")
+  (copilot-idle-delay nil)
+  :bind (("C-c <tab>" . copilot-complete)
+         :map copilot-completion-map
+         ("C-c <return>" . copilot-accept-completion)
+         ("C-<tab>" . copilot-accept-completion-by-word))
+  )
+
+(use-package gptel
+  :ensure t
+  :config
+  (setq gptel-model 'gpt-5.3-codex
+        gptel-backend (gptel-make-gh-copilot "Copilot"))
+  :bind
+  ("C-c g r" . gptel-rewrite)
+  ("C-c g a" . gptel-add)
+  )
+
+(use-package org-superstar
+  :ensure t
+  :hook (org-mode . org-superstar-mode))
+
+(use-package doom-modeline
+  :ensure t
+  :config
+  (doom-modeline-mode t)
+  )
 
 (use-package reformatter
   :ensure t
@@ -355,15 +431,24 @@
   :ensure t
   :defer t)
 
-(use-package docker-compose-mode
-  :ensure t)
+(use-package denote
+  :ensure t
+  :hook (dired-mode . denote-dired-mode)
+  :bind
+  (
+   ("C-c n n" . denote-open-or-create )
+   )
+  :config
+  (setq denote-directory (expand-file-name "~/notes"))
+  )
 
 (use-package dockerfile-mode
   :ensure t)
 
-;;; LaTeX / PDF
+(use-package docker-compose-mode
+  :ensure t)
 
-(use-package auctex
+(use-package rainbow-delimiters
   :ensure t
   :hook ((LaTeX-mode . display-line-numbers-mode)
          (LaTeX-mode . reftex-mode)
