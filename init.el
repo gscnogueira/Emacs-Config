@@ -154,15 +154,15 @@
   (evil-mode t)
   (evil-set-initial-state 'Info-mode 'emacs)
   (evil-set-initial-state 'dired-mode 'emacs)
-  (evil-set-initial-state 'agent-shell-mode 'emacs)
-  (evil-set-initial-state 'vterm-mode 'emacs))
+  (evil-set-initial-state 'agent-shell-mode 'emacs))
 
 (use-package evil-collection
   :ensure t
   :after evil
   :config
-  (setq evil-collection-vterm-state 'emacs)
-  (evil-collection-init))
+  (evil-collection-init)
+  (with-eval-after-load 'vterm
+    (evil-set-initial-state 'vterm-mode 'emacs)))
 
 (use-package rainbow-delimiters
   :ensure t
