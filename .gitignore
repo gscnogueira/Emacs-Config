@@ -36,5 +36,10 @@ diary
 # Outros arquivos de estado
 config.org~
 
+# Estado gerado automaticamente
+recentf
+abbrev_defs
+agent/
+
 # Configurações locais (IPs, dados de máquina)
 local.el
