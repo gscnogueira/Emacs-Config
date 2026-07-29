@@ -1,40 +1,20 @@
-;;; Bootstrap
+;; use-package setup
 
 (require 'package)
+
 (add-to-list 'package-archives
 	     '("melpa" . "https://melpa.org/packages/") t)
 
-(add-to-list 'exec-path (expand-file-name "~/.npm-global/bin"))
-(add-to-list 'exec-path (expand-file-name "~/.opencode/bin/"))
-
-(package-initialize)
-
-(unless package-archive-contents
+(unless package-archive-contents ; primeira instalação: baixa índice do MELPA
   (package-refresh-contents))
 
-(setq use-package-enable-imenu-support t)
-(eval-when-compile (require 'use-package))
-
-(defvar my/ollama-host "localhost:11434")
-(let ((local (expand-file-name "local.el" user-emacs-directory)))
-  (when (file-exists-p local)
-    (load local)))
-
-;;; Core
-
-(use-package dired
-  :custom
-  (dired-create-destination-dirs t)
-  :hook
-  (dired-mode . dired-hide-details-mode)
-  (dired-mode . dired-omit-mode)
-  :config
-  (require 'dired-x)
-  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$")))
+(setq use-package-enable-imenu-support t) ; expõe cada pacote no imenu (C-x j)
 
 (use-package emacs
   :init
   (add-to-list 'default-frame-alist '(font . "JetBrains Mono-15"))
+  (dolist (dir '("~/.npm-global/bin" "~/.opencode/bin/" "~/.local/bin/"))
+    (add-to-list 'exec-path (expand-file-name dir)))
   :hook
   (prog-mode . display-line-numbers-mode)
   (prog-mode . hl-line-mode)
@@ -52,7 +32,7 @@
   (setq-default left-margin-width 1)
   (add-hook 'prog-mode-hook
 	    (lambda () (setq left-margin-width 0)))
-  (load custom-file)
+  (load custom-file 'noerror)
   (setq make-backup-files nil)
   (setq frame-resize-pixelwise t)
   (setq window-resize-pixelwise t)
@@ -60,7 +40,15 @@
   (setq native-comp-async-report-warnings-errors 'silent)
   (winner-mode 1))
 
-;;; UI
+(use-package dired
+  :custom
+  (dired-create-destination-dirs t)
+  :hook
+  (dired-mode . dired-hide-details-mode)
+  (dired-mode . dired-omit-mode)
+  :config
+  (require 'dired-x)
+  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$")))
 
 (use-package modus-themes
   :ensure t
@@ -99,8 +87,6 @@
                                    "\\\\\\" "://"))
   (global-ligature-mode t))
 
-;;; Completion
-
 (use-package vertico
   :ensure t
   :init
@@ -138,14 +124,14 @@
 (use-package embark
   :ensure t
   :bind
-  (("C-c ." . embark-act)))
+  (("C-c ." . embark-act)
+   ("C-."   . embark-act)
+   ("M-."   . embark-dwim)))
 
 (use-package embark-consult
   :ensure t
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
-
-;;; Editing
 
 (use-package which-key
   :ensure t
@@ -156,8 +142,6 @@
   :ensure t
   :init
   (setq evil-want-keybinding nil)
-  :custom
-  (evil-want-keybinding nil)
   :config
   (evil-mode t)
   (evil-set-initial-state 'Info-mode 'emacs)
@@ -321,7 +305,7 @@
   (setq gc-cons-threshold 1000000000)
   (setq read-process-output-max (* 1024 1024))
   (setq lsp-signature-render-documentation nil)
-  (setq lsp-ruff-lint-select ["E","F", "I", "B"])
+  (setq lsp-ruff-lint-select ["E" "F" "I" "B"])
   (setq flymake-show-diagnostics-at-end-of-line nil)
   (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly))
 
