@@ -202,6 +202,7 @@
   :ensure t
   :after evil
   :config
+  (setq evil-collection-vterm-state 'emacs)
   (evil-collection-init))
 
 (use-package rainbow-delimiters
