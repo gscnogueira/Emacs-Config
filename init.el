@@ -306,7 +306,9 @@
   (agent-shell-header-style 'text)
   (agent-shell-show-welcome-message nil)
   (agent-shell-context-sources '(files region error))
+  (agent-shell-opencode-default-model-id "opencode-go/deepseek-v4-pro")
   )
+
 
 ;;; Git
 
