@@ -278,10 +278,6 @@
 (use-package gptel
   :ensure t
   :config
-  (gptel-make-ollama "Ollama"
-    :host my/ollama-host
-    :stream t
-    :models '(gemma4:26b qwen3-coder:30b))
   (gptel-make-gh-copilot "Copilot")
   (setq gptel-backend (gptel-get-backend "Copilot")
 	gptel-model 'gpt-4o)
@@ -294,22 +290,23 @@
   :ensure-system-package
   ((claude-agent-acp . "npm install -g @agentclientprotocol/claude-agent-acp"))
   :bind
-  (("C-c s s" . agent-shell)
+  (
+   ("C-c b" . agent-shell-switch-buffer)
+   ("C-c SPC" . agent-shell)
+   ("C-c s o" . agent-shell-opencode-start-agent)
+   ("C-c s c" . agent-shell-anthropic-start-claude-code)
+   ("C-c s p" . agent-shell-github-start-copilot)
    ("C-c s t" . agent-shell-toggle)
-   ("C-c s b" . agent-shell-switch-buffer)
-   ("C-c s n" . agent-shell-new-shell)
-   ("C-c s c" . agent-shell-prompt-compose)
+   :map agent-shell-mode-map
+   ("C-c n" . agent-shell-new-shell)
+   ("C-c g" . agent-shell-prompt-compose)
    :map agent-shell-diff-mode-map
    ("a" . agent-shell-diff-accept-all))
   :custom
-  (agent-shell-preferred-agent-config 'claude-code)
   (agent-shell-header-style 'text)
   (agent-shell-show-welcome-message nil)
   (agent-shell-context-sources '(files region error))
-  :hook
-  (diff-mode . (lambda ()
-		 (when (string-match-p "\\*agent-shell-diff\\*" (buffer-name))
-		   (evil-emacs-state)))))
+  )
 
 ;;; Git
 
