@@ -165,15 +165,14 @@
   :bind ("C-c t" . vterm)
   )
 
-;;; Org / Notes
-
 (use-package org
   :hook ((org-mode          . org-indent-mode)
          (org-agenda-mode   . hl-line-mode)
          (org-babel-after-execute . org-redisplay-inline-images))
   :bind
   (("C-c a" . org-agenda)
-   ("C-c c" . org-capture))
+   ("C-c c" . org-capture)
+   ("C-c n q" . my/consult-notes))
   :custom
   (org-hide-emphasis-markers t)
   (org-startup-with-inline-images t)
@@ -208,36 +207,62 @@
   (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
   (add-hook 'org-mode-hook 'variable-pitch-mode)
   (add-hook 'org-mode-hook #'my/org-prettify-checkboxes)
-  (setq org-agenda-files '("~/org/chatfiocruz/"))
+  (setq org-agenda-files '("~/.notes"))
+
+  (defun my/org-narrow-next-subtree (arg)
+    "Widen, vai para a próxima heading e estreita na subtree dela."
+    (interactive "p")
+    (widen)
+    (org-next-visible-heading (or arg 1))
+    (org-narrow-to-subtree))
+
+  (defun my/consult-notes ()
+    "Search headings in ~/.notes."
+    (interactive)
+    (consult-org-agenda "+notes"))
   )
 
 (use-package org-superstar
   :ensure t
   :hook (org-mode . org-superstar-mode))
 
+(use-package org-present
+  :ensure t)
+
 (use-package denote
   :ensure t
   :hook (dired-mode . denote-dired-mode)
   :bind
   (("C-c n n" . denote-open-or-create)
-   ("C-c n d" . denote-dired)
+   ("C-c n d" . denote-date)
    ("C-c n l" . denote-link-or-create))
   :config
   (setq denote-directory (expand-file-name "~/notes"))
   (setq denote-date-prompt-use-org-read-date t)
-  (denote-rename-buffer-mode 1))
+  (denote-rename-buffer-mode 1)
+  (setq-default abbrev-mode t))
 
 (use-package org-roam
   :ensure t
   :custom
   (org-roam-directory (expand-file-name "~/research"))
-  :bind (("C-c r f" . org-roam-node-find)
-         ("C-c r i" . org-roam-node-insert)
+  :bind (("C-c f" . org-roam-node-find)
+         ("C-c i" . org-roam-node-insert)
          ("C-c r b" . org-roam-buffer-toggle))
   :config
   (org-roam-db-autosync-mode))
 
-;;; AI / LLM
+(use-package citar
+  :ensure t
+  :custom
+  (citar-bibliography '("~/research/references.bib"))
+  (org-cite-global-bibliography '("~/research/references.bib"))
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar)
+  :bind
+  (:map org-mode-map
+   ("C-c [" . citar-insert-citation)))
 
 (use-package copilot
   :ensure t
@@ -358,22 +383,3 @@
 (use-package ledger-mode
   :defer t
   :ensure t)
-
-;;; Custom
-
-(defun my/org-new-fiocruz-sprint ()
-  (interactive)
-  (let* ((start    (org-read-date nil nil nil "Início do sprint: "))
-         (end      (org-read-date nil nil nil "Fim do sprint: "))
-         (title    (format "Sprint %s - %s" start end))
-         (filename (expand-file-name
-                    (format "sprint_%s_%s.org" start end)
-                    "~/org/chatfiocruz/")))
-    (find-file filename)
-    (when (= (buffer-size) 0)
-      (insert "#+title: " title "\n"
-              "#+CATEGORY: fiocruz\n\n"
-              "* Resumo da Reunião\n\n"
-              "* Tarefas\n\n"
-              "* Diário\n"))
-    (goto-char (point-min))))
