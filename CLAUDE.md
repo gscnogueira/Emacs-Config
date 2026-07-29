@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Rules
 
 - This is an Emacs configuration directory. Emacs is self-documenting — packages include extensive docstrings and `describe-*` commands. Consult package documentation before inferring behavior. You have access to all installed package sources under `elpa/`.
-- Do not make code changes unless explicitly asked.
+- Do not make code changes unless explicitly asked. When answering questions like "how do I do X?", explain the solution — do NOT edit files unless the user explicitly tells you to apply the change.
 - After any changes, ask whether to commit. If yes, propose the commit message and wait for approval before committing (may push along with the commit).
 
 ## About
