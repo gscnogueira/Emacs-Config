@@ -43,6 +43,7 @@
   (setq frame-resize-pixelwise t)
   (setq window-resize-pixelwise t)
   (setq initial-major-mode 'org-mode) ;; org mode for initial buffer
+  (setq-default major-mode 'org-mode) ;; org mode for new buffers without extension
   (setq native-comp-async-report-warnings-errors 'silent)
   (winner-mode 1)
 )
@@ -187,16 +188,23 @@
   (org-startup-with-inline-images t)
   (org-confirm-babel-evaluate nil)
   (org-todo-keywords
-   '((sequence "TODO(t)" "BLOCKED(b@)" "|" "DONE(d)" "CANCELLED(c@)")))
-  (org-agenda-custom-commands
-   '(("t" "TODOs"
-      ((agenda "") (todo ""))
-      ((org-agenda-tag-filter-preset '("-noagenda"))))
-     ))
+   '((sequence "TODO(t)" "PROG(p)" "BLOCKED(b@)" "|" "DONE(d)" "CANCELLED(c@)")))
+   (org-agenda-custom-commands
+    '(("t" "TODOs"
+       ((agenda "") (todo ""))
+       ((org-agenda-tag-filter-preset '("-noagenda"))))
+      ("f" "Fiocruz"
+       ((agenda "") (todo ""))
+       ((org-agenda-files '("~/org/fiocruz/"))))
+      ))
   (org-agenda-span 'day)
   (org-enforce-todo-dependencies t)
-  (org-enforce-todo-checkbox-dependencies t)
-  (org-hide-drawer-startup t)
+   (org-enforce-todo-checkbox-dependencies t)
+   (org-hide-drawer-startup t)
+   (org-capture-templates
+    '(("t" "Todo" entry
+       (function my/org-fiocruz-target)
+       "* TODO %?\n  %i\n")))
   (org-agenda-clockreport-parameter-plist '(:scope agenda-with-archives :maxlevel 3))
   :config
   (defun my/org-prettify-checkboxes ()
