@@ -335,7 +335,11 @@
 (use-package diff-hl
   :ensure t
   :config
-  (global-diff-hl-mode t))
+  (evil-define-key 'normal 'global
+    "]d" #'diff-hl-next-hunk
+    "[d" #'diff-hl-previous-hunk)
+  (global-diff-hl-mode t)
+  )
 
 ;;; Dev
 
