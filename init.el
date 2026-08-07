@@ -300,8 +300,7 @@
   (setq gptel-backend (gptel-get-backend "Copilot")
 	gptel-model 'gpt-4o)
   :bind
-  ("C-c g r" . gptel-rewrite)
-  ("C-c g a" . gptel-add)
+  ("C-c C-a" . gptel-add)
   ("C-c RET" . gptel-menu))
 
 (use-package agent-shell
