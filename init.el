@@ -155,7 +155,8 @@
   (evil-mode t)
   (evil-set-initial-state 'Info-mode 'emacs)
   (evil-set-initial-state 'dired-mode 'emacs)
-  (evil-set-initial-state 'agent-shell-mode 'emacs))
+  (evil-set-initial-state 'agent-shell-mode 'emacs)
+  (evil-set-initial-state 'agent-shell-diff-mode 'emacs))
 
 (use-package evil-collection
   :ensure t
