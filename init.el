@@ -168,18 +168,17 @@
   :after evil
   :config
   (evil-collection-init)
-  (with-eval-after-load 'vterm
-    (evil-set-initial-state 'vterm-mode 'emacs)))
+  (with-eval-after-load 'ghostel
+    (evil-set-initial-state 'ghostel-mode 'emacs)))
 
 (use-package rainbow-delimiters
   :ensure t
   :hook
   (prog-mode . rainbow-delimiters-mode))
 
-(use-package vterm
+(use-package ghostel
   :ensure t
-  :bind ("C-c t" . vterm)
-  )
+  :bind ("C-c t" . ghostel))
 
 (use-package org
   :hook ((org-mode          . org-indent-mode)
