@@ -28,12 +28,14 @@
   (tool-bar-mode nil)
   (menu-bar-mode nil)
   (scroll-bar-mode nil)
-  (recentf-mode t)
+  (recentf-mode nil)
   (global-visual-line-mode t)
   (column-number-mode t)
   (apropos-sort-by-scores t)
 
   :config
+  (setq tab-bar-new-tab-choice "*scratch*")
+
   (setq-default left-margin-width 1) 
   ;; Set left-margin-width to 0 on prog-mode
   (add-hook 'prog-mode-hook
@@ -115,9 +117,11 @@
   :bind
   (("C-x b"       . consult-buffer)
    ("C-c j"       . consult-outline)
+   ("C-c b"       . consult-bookmark)
    ("C-c m"       . consult-line-multi)
-   ("C-c o"       . consult-org-agenda)
-   ("C-x j"       . consult-imenu)))
+   ("C-x j"       . consult-imenu)
+
+   ))
 
 (use-package corfu
   :ensure t
