@@ -402,16 +402,20 @@
   :hook ((LaTeX-mode . display-line-numbers-mode)
          (LaTeX-mode . reftex-mode)
          (LaTeX-mode . TeX-source-correlate-mode)
-         (LaTeX-mode . flyspell-mode)))
+         (LaTeX-mode . flyspell-mode))
+  :custom
+  (TeX-command-default "LaTeXMk")
+  )
 
 (use-package pdf-tools
   :ensure t
   :custom
-  (pdf-view-continuous nil)
+  (pdf-view-continuous t)
+  (pdf-view-midnight-colors '("#ffffff" . "#000000"))
+
   :config
   (pdf-tools-install))
 
-;;; Finance
 
 (use-package ledger-mode
   :defer t
