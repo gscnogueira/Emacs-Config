@@ -187,7 +187,7 @@
   :bind
   (("C-c a" . org-agenda)
    ("C-c c" . org-capture)
-   ("C-c n q" . my/consult-notes))
+   )
   :custom
   (org-hide-emphasis-markers t)
   (org-startup-with-inline-images t)
@@ -198,19 +198,18 @@
     '(("t" "TODOs"
        ((agenda "") (todo ""))
        ((org-agenda-tag-filter-preset '("-noagenda"))))
-      ("f" "Fiocruz"
-       ((agenda "") (todo ""))
-       ((org-agenda-files '("~/org/fiocruz/"))))
       ))
   (org-agenda-span 'day)
+  (org-agenda-prefix-format
+   '((agenda  . " %i %-12:c%?-12t % s %-6e")
+     (todo    . " %i %-12:c %-6e")
+     (tags    . " %i %-12:c %-6e")
+     (search  . " %i %-12:c %-6e")))
   (org-enforce-todo-dependencies t)
    (org-enforce-todo-checkbox-dependencies t)
    (org-hide-drawer-startup t)
-   (org-capture-templates
-    '(("t" "Todo" entry
-       (function my/org-fiocruz-target)
-       "* TODO %?\n  %i\n")))
-  (org-agenda-clockreport-parameter-plist '(:scope agenda-with-archives :maxlevel 3))
+   (org-agenda-clockreport-parameter-plist
+    '(:scope agenda-with-archives :maxlevel 3))
   :config
   (defun my/org-prettify-checkboxes ()
     (push '("[ ]" . "☐") prettify-symbols-alist)
@@ -229,7 +228,6 @@
   (set-face-attribute 'org-date nil :inherit 'fixed-pitch)
   (add-hook 'org-mode-hook 'variable-pitch-mode)
   (add-hook 'org-mode-hook #'my/org-prettify-checkboxes)
-  (setq org-agenda-files '("~/.notes"))
 
   (defun my/org-narrow-next-subtree (arg)
     "Widen, vai para a próxima heading e estreita na subtree dela."
@@ -237,11 +235,6 @@
     (widen)
     (org-next-visible-heading (or arg 1))
     (org-narrow-to-subtree))
-
-  (defun my/consult-notes ()
-    "Search headings in ~/.notes."
-    (interactive)
-    (consult-org-agenda "+notes"))
   )
 
 (use-package org-superstar
@@ -262,7 +255,7 @@
   (setq denote-directory (expand-file-name "~/notes"))
   (setq denote-date-prompt-use-org-read-date t)
   (denote-rename-buffer-mode 1)
-  (setq-default abbrev-mode t))
+  )
 
 (use-package org-roam
   :ensure t
