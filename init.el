@@ -416,7 +416,34 @@
   :config
   (pdf-tools-install))
 
-
 (use-package ledger-mode
   :defer t
   :ensure t)
+
+(use-package avy
+  :ensure t
+  :bind ("C-;" . avy-goto-char-timer))
+
+;; Customizações pessoais
+
+(defun my/org-checkbox-todo-strike-through ()
+  "Apply strike-through face to completed Org-mode checkboxes."
+  (font-lock-add-keywords
+   'org-mode
+   '(("^\\s-*\\(?:[-+*]\\|\\s-*[0-9]+[.)]\\)\\s-+\\[X\\]\\s-+\\(.*\\)$"
+      1 '(:strike-through t :foreground "gray") append))))
+
+(add-hook 'org-mode-hook #'my/org-checkbox-todo-strike-through)
+
+(defun my/org-jump-level1-narrowed (files)
+  (consult-org-heading "LEVEL=1" files)
+  (org-narrow-to-subtree)
+  (org-show-subtree))
+
+(transient-define-prefix my/org-jump-menu ()
+  "Navegar headings de nível 1"
+  ["Arquivo"
+   ("o" "Orientação" (lambda () (interactive) (my/org-jump-level1-narrowed '("~/org/orientacao.org"))))])
+
+(global-set-key (kbd "C-c o") #'my/org-jump-menu)
+
