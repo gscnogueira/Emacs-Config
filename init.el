@@ -309,7 +309,7 @@
 	gptel-model 'gpt-4o)
   :bind
   ("C-c C-a" . gptel-add)
-  ("C-c RET" . gptel-menu))
+  ("C-c C-<return>" . gptel-menu))
 
 (use-package agent-shell
   :ensure t
@@ -317,22 +317,26 @@
   ((claude-agent-acp . "npm install -g @agentclientprotocol/claude-agent-acp"))
   :bind
   (
-   ("C-c b" . agent-shell-switch-buffer)
+   ("C-c s b" . agent-shell-switch-buffer)
    ("C-c SPC" . agent-shell)
    ("C-c s o" . agent-shell-opencode-start-agent)
    ("C-c s c" . agent-shell-anthropic-start-claude-code)
-   ("C-c s p" . agent-shell-github-start-copilot)
-   ("C-c s t" . agent-shell-toggle)
    :map agent-shell-mode-map
    ("C-c n" . agent-shell-new-shell)
    ("C-c g" . agent-shell-prompt-compose)
+   ("C-c SPC" . agent-shell-toggle)
    :map agent-shell-diff-mode-map
    ("a" . agent-shell-diff-accept-all))
   :custom
   (agent-shell-header-style 'text)
   (agent-shell-show-welcome-message nil)
-  (agent-shell-context-sources '(files region error))
   (agent-shell-opencode-default-model-id "opencode-go/deepseek-v4-pro/max")
+  (agent-shell-preferred-agent-config 'claude-code)
+  (agent-shell-anthropic-default-session-mode-id "default")
+  (agent-shell-anthropic-default-model-id "claude-sonnet-4-6")
+  (agent-shell-session-strategy 'new)
+  (agent-shell-activity-group-expand-by-default 'latest)
+  (agent-shell-prefer-viewport-interaction nil)
   )
 
 
