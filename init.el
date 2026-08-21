@@ -17,6 +17,7 @@
 (use-package emacs
   :init
   (add-to-list 'default-frame-alist '(font . "JetBrains Mono-15"))
+  (add-to-list 'default-frame-alist '(alpha-background . 100))
   (dolist (dir '("~/.npm-global/bin" "~/.opencode/bin/" "~/.local/bin/"))
     (add-to-list 'exec-path (expand-file-name dir)))
   :hook
