@@ -263,15 +263,17 @@
   (org-roam-directory (expand-file-name "~/research"))
   :bind (("C-c f" . org-roam-node-find)
          ("C-c i" . org-roam-node-insert)
-         ("C-c r b" . org-roam-buffer-toggle))
+         ("C-c r b" . org-roam-buffer-toggle)
+	 )
   :config
   (org-roam-db-autosync-mode))
 
 (use-package citar
   :ensure t
   :custom
-  (citar-bibliography '("~/research/references.bib"))
-  (org-cite-global-bibliography '("~/research/references.bib"))
+  (citar-bibliography '("~/zotero/library.bib"))
+  (org-cite-global-bibliography '("~/zotero/library.bib"))
+  (citar-library-paths '("~/zotero/storage"))
   (org-cite-insert-processor 'citar)
   (org-cite-follow-processor 'citar)
   (org-cite-activate-processor 'citar)
@@ -279,12 +281,21 @@
   (:map org-mode-map
    ("C-c [" . citar-insert-citation)))
 
+(use-package citar-denote
+  :ensure t
+  :after (citar denote)
+  :custom
+  (citar-denote-keyword "artigo")
+  :config
+  (citar-denote-mode))
+
 (use-package copilot
   :ensure t
   :hook (prog-mode . copilot-mode)
   :custom
   (copilot-server-executable (expand-file-name "~/.npm-global/bin/copilot-language-server"))
   (copilot-idle-delay nil)
+  (copilot-indent-offset-warning-disable t)
   :bind (("C-c <tab>" . copilot-complete)
          :map copilot-completion-map
          ("C-c <return>" . copilot-accept-completion)
