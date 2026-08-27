@@ -194,22 +194,22 @@
   (org-hide-emphasis-markers t)
   (org-startup-with-inline-images t)
   (org-confirm-babel-evaluate nil)
-   (org-agenda-custom-commands
-    '(("t" "TODOs"
-       ((agenda "") (todo ""))
-       ((org-agenda-tag-filter-preset '("-noagenda"))))
-      ))
+  (org-agenda-custom-commands
+   '(("t" "TODOs"
+      ((agenda "") (todo ""))
+      ((org-agenda-tag-filter-preset '("-noagenda"))))
+     ))
   (org-agenda-span 'day)
   (org-agenda-prefix-format
    '((agenda  . " %i %-12:c%?-12t % s %-6e")
-     (todo    . " %i %-12:c %-6e")
+     (todo    . " %i %-12:c % s%-6e")
      (tags    . " %i %-12:c %-6e")
      (search  . " %i %-12:c %-6e")))
   (org-enforce-todo-dependencies t)
-   (org-enforce-todo-checkbox-dependencies t)
-   (org-hide-drawer-startup t)
-   (org-agenda-clockreport-parameter-plist
-    '(:scope agenda-with-archives :maxlevel 1))
+  (org-enforce-todo-checkbox-dependencies t)
+  (org-hide-drawer-startup t)
+  (org-agenda-clockreport-parameter-plist '(:scope agenda-with-archives :maxlevel 1))
+  (org-agenda-todo-ignore-deadlines t)
   :config
   (defun my/org-prettify-checkboxes ()
     (push '("[ ]" . "☐") prettify-symbols-alist)
@@ -326,7 +326,7 @@
   ((claude-agent-acp . "npm install -g @agentclientprotocol/claude-agent-acp"))
   :bind
   (
-   ("C-c s b" . agent-shell-switch-buffer)
+   ("C-c  b" . agent-shell-switch-buffer)
    ("C-c SPC" . agent-shell)
    ("C-c s o" . agent-shell-opencode-start-agent)
    ("C-c s c" . agent-shell-anthropic-start-claude-code)
