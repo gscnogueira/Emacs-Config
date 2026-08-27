@@ -117,7 +117,6 @@
   :bind
   (("C-x b"       . consult-buffer)
    ("C-c j"       . consult-outline)
-   ("C-c b"       . consult-bookmark)
    ("C-c m"       . consult-line-multi)
    ("C-x j"       . consult-imenu)
 
@@ -167,7 +166,10 @@
   :ensure t
   :after evil
   :config
+  (setq evil-collection-mode-list
+        (remove 'org-agenda evil-collection-mode-list))
   (evil-collection-init)
+  (evil-set-initial-state 'org-agenda-mode 'emacs)
   (with-eval-after-load 'ghostel
     (evil-set-initial-state 'ghostel-mode 'emacs)))
 
@@ -192,8 +194,6 @@
   (org-hide-emphasis-markers t)
   (org-startup-with-inline-images t)
   (org-confirm-babel-evaluate nil)
-  (org-todo-keywords
-   '((sequence "TODO(t)" "PROG(p)" "BLOCKED(b@)" "|" "DONE(d)" "CANCELLED(c@)")))
    (org-agenda-custom-commands
     '(("t" "TODOs"
        ((agenda "") (todo ""))
@@ -209,7 +209,7 @@
    (org-enforce-todo-checkbox-dependencies t)
    (org-hide-drawer-startup t)
    (org-agenda-clockreport-parameter-plist
-    '(:scope agenda-with-archives :maxlevel 3))
+    '(:scope agenda-with-archives :maxlevel 1))
   :config
   (defun my/org-prettify-checkboxes ()
     (push '("[ ]" . "☐") prettify-symbols-alist)
@@ -233,9 +233,19 @@
     "Widen, vai para a próxima heading e estreita na subtree dela."
     (interactive "p")
     (widen)
-    (org-next-visible-heading (or arg 1))
+    (org-next-visible-heading arg)
     (org-narrow-to-subtree))
-  )
+
+  (defun my/org-narrow-previous-subtree (arg)
+    "Widen, vai para a heading anterior e estreita na subtree dela."
+    (interactive "p")
+    (my/org-narrow-next-subtree (- arg)))
+
+  (evil-define-key 'normal org-mode-map
+    "gj" #'evil-next-visual-line
+    "gk" #'evil-previous-visual-line
+    "gn" #'my/org-narrow-next-subtree
+    "gp" #'my/org-narrow-previous-subtree))
 
 (use-package org-superstar
   :ensure t
@@ -261,8 +271,7 @@
   :ensure t
   :custom
   (org-roam-directory (expand-file-name "~/research"))
-  :bind (("C-c f" . org-roam-node-find)
-         ("C-c i" . org-roam-node-insert)
+  :bind (("C-c i" . org-roam-node-insert)
          ("C-c r b" . org-roam-buffer-toggle)
 	 )
   :config
@@ -440,10 +449,22 @@
   (org-narrow-to-subtree)
   (org-show-subtree))
 
-(transient-define-prefix my/org-jump-menu ()
-  "Navegar headings de nível 1"
-  ["Arquivo"
-   ("o" "Orientação" (lambda () (interactive) (my/org-jump-level1-narrowed '("~/org/orientacao.org"))))])
 
-(global-set-key (kbd "C-c o") #'my/org-jump-menu)
+(defun my/jump-reunioes-luis ()
+  (interactive)
+  (my/org-jump-level1-narrowed '("~/org/orientacao.org")))
+
+(transient-define-prefix my/buffer-nav-menu ()
+  "Navegar buffers"
+  ["Find"
+   ("f" "Org Roam"           org-roam-node-find)
+   ("n" "Denote"             denote-open-or-create)
+   ("l" "Reuniões (Luís)"   my/jump-reunioes-luis)
+   ("b" "Bookmarks"          consult-bookmark)]
+  ["Buffers"
+   ("a" "Agent Shell"        agent-shell-switch-buffer)
+   ("g" "Ghostel"            ghostel-list-buffers)
+   ("G" "Ghostel projeto"    ghostel-project-list-buffers)])
+
+(global-set-key (kbd "C-c f") #'my/buffer-nav-menu)
 
