@@ -363,24 +363,6 @@
   (global-diff-hl-mode t)
   )
 
-;;; Dev
-
-(use-package lsp-mode
-  :ensure t
-  :commands lsp
-  :config
-  (setq gc-cons-threshold 1000000000)
-  (setq read-process-output-max (* 1024 1024))
-  (setq lsp-signature-render-documentation nil)
-  (setq lsp-ruff-lint-select ["E" "F" "I" "B"])
-  (setq flymake-show-diagnostics-at-end-of-line nil)
-  (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly))
-
-(use-package lsp-pyright
-  :ensure t
-  :custom (lsp-pyright-langserver-command "pyright")
-  :hook
-  (python-mode . lsp))
 
 (use-package reformatter
   :ensure t
