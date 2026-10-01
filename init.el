@@ -1,4 +1,4 @@
-;; use-package setup
+;; use-package setup  -*- lexical-binding: t; -*-
 
 (require 'package)
 
@@ -32,11 +32,10 @@
   (global-visual-line-mode t)
   (column-number-mode t)
   (apropos-sort-by-scores t)
+  (treesit-enabled-modes '(python-ts-mode))
 
   :config
-  (setq tab-bar-new-tab-choice "*scratch*")
-
-  (setq-default left-margin-width 1) 
+  (setq-default left-margin-width 1)
   ;; Set left-margin-width to 0 on prog-mode
   (add-hook 'prog-mode-hook
 	    (function(lambda () (setq left-margin-width 0)))
@@ -50,6 +49,13 @@
   (setq native-comp-async-report-warnings-errors 'silent)
   (winner-mode 1)
 )
+
+(use-package tab-bar
+  :custom
+  (tab-bar-new-tab-choice "*scratch*")
+  :bind
+  ("C-<tab>" . tab-bar-switch-to-recent-tab))
+
 
 (use-package dired
   :custom
@@ -115,12 +121,13 @@
 (use-package consult
   :ensure t
   :bind
-  (("C-x b"       . consult-buffer)
-   ("C-c j"       . consult-outline)
+  (("C-c j"       . consult-outline)
    ("C-c m"       . consult-line-multi)
    ("C-x j"       . consult-imenu)
-
+   ("C-x p b"     . consult-project-buffer)
+   ("C-x b"       . consult-buffer)
    ))
+
 
 (use-package corfu
   :ensure t
@@ -134,17 +141,15 @@
   :init
   (marginalia-mode 1))
 
-(use-package embark
-  :ensure t
-  :bind
-  (("C-c ." . embark-act)
-   ("C-."   . embark-act)
-   ("M-."   . embark-dwim)))
+(use-package nerd-icons
+  :ensure t)
 
-(use-package embark-consult
+(use-package nerd-icons-completion
   :ensure t
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
+  :after marginalia
+  :config
+  (nerd-icons-completion-mode 1)
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
 
 (use-package which-key
   :ensure t
@@ -160,7 +165,9 @@
   (evil-set-initial-state 'Info-mode 'emacs)
   (evil-set-initial-state 'dired-mode 'emacs)
   (evil-set-initial-state 'agent-shell-mode 'emacs)
-  (evil-set-initial-state 'agent-shell-diff-mode 'emacs))
+  (evil-set-initial-state 'agent-shell-diff-mode 'emacs)
+  (evil-set-initial-state 'agent-shell-viewport-view-mode 'emacs)
+  )
 
 (use-package evil-collection
   :ensure t
@@ -179,8 +186,18 @@
   (prog-mode . rainbow-delimiters-mode))
 
 (use-package ghostel
-  :ensure t
-  :bind ("C-c t" . ghostel))
+  :ensure t)
+
+(use-package consult-ghostel
+    :ensure t
+    :after (ghostel consult)
+    :demand t
+    :config (consult-ghostel-mode)
+    :bind (("C-x m" . consult-ghostel)
+           :map project-prefix-map
+           ("m" . consult-ghostel-project)
+           :map ghostel-semi-char-mode-map
+           ("C-c h" . consult-ghostel-history)))
 
 (use-package org
   :hook ((org-mode          . org-indent-mode)
@@ -194,23 +211,52 @@
   (org-hide-emphasis-markers t)
   (org-startup-with-inline-images t)
   (org-confirm-babel-evaluate nil)
+  (org-directory "~/org")
+  (org-agenda-files '("~/org/todo.org" "~/org/agenda.org"))
+  (org-capture-templates
+   '(("t" "Tarefa" entry (file+olp "~/org/todo.org" "Inbox")
+      "* TODO %?"
+      :empty-lines 1)
+     ("a" "Agenda" entry (file "~/org/agenda.org")
+      "* %?\n%^T")))
+  (org-refile-targets '((("~/org/todo.org") :maxlevel . 1)))
+  (org-refile-use-outline-path 'file)
+  (org-outline-path-complete-in-steps nil)
+  (org-log-done 'time)
+  (org-log-into-drawer t)
+  (org-agenda-todo-ignore-scheduled 'future)
   (org-agenda-custom-commands
-   '(("t" "TODOs"
-      ((agenda "") (todo ""))
-      ((org-agenda-tag-filter-preset '("-noagenda"))))
-     ))
+   '(("a" "Hoje"
+      ((agenda ""))
+      ((org-agenda-span 'day)
+       (org-agenda-clockreport-mode t)))
+     ("t" "Backlog"
+      ((todo "TODO"))
+      nil)))
   (org-agenda-span 'day)
+  (org-agenda-use-time-grid nil)
   (org-agenda-prefix-format
    '((agenda  . " %i %-12:c%?-12t % s %-6e")
-     (todo    . " %i %-12:c % s%-6e")
-     (tags    . " %i %-12:c %-6e")
+     (todo    . " %i %-12:c% s")
+     (tags    . " %i %-12:c")
      (search  . " %i %-12:c %-6e")))
+  (org-todo-keywords
+   '((sequence "TODO(t)" "PROG(p)" "|" "DONE(d)")))
   (org-enforce-todo-dependencies t)
   (org-enforce-todo-checkbox-dependencies t)
+  (org-default-priority ?C)
   (org-hide-drawer-startup t)
-  (org-agenda-clockreport-parameter-plist '(:scope agenda-with-archives :maxlevel 1))
-  (org-agenda-todo-ignore-deadlines t)
+  (org-agenda-clockreport-parameter-plist '(:scope agenda-with-archives :maxlevel 1 :fileskip0 t))
+  (org-clock-mode-line-total 'today)
   :config
+  (require 'org-tempo)
+  (add-to-list 'org-tempo-keywords-alist '("t" . "title"))
+  (tempo-define-template "org-date"
+                          '("#+date: " (format-time-string "[%Y-%m-%d %a]") p '>)
+                          "<d"
+                          "Insere #+date: com a data atual"
+                          'org-tempo-tags)
+
   (defun my/org-prettify-checkboxes ()
     (push '("[ ]" . "☐") prettify-symbols-alist)
     (push '("[X]" . "☑") prettify-symbols-alist)
@@ -222,6 +268,7 @@
     (push '("<=>" . ?⟺) prettify-symbols-alist)
     (prettify-symbols-mode 1))
   (set-face-attribute 'variable-pitch nil :family "Literata" :height 160)
+  (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono")
   (set-face-attribute 'org-block nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-code nil :inherit 'fixed-pitch)
@@ -271,11 +318,21 @@
   :ensure t
   :custom
   (org-roam-directory (expand-file-name "~/research"))
-  :bind (("C-c i" . org-roam-node-insert)
-         ("C-c r b" . org-roam-buffer-toggle)
+  (org-roam-node-display-template "${title:*} ${tags:20}")
+  :bind (
+	 ("C-c f" . org-roam-node-find)
+	 ("C-c i" . org-roam-node-insert)
+	 ("C-c r" . my/org-roam-menu)
 	 )
   :config
-  (org-roam-db-autosync-mode))
+  (org-roam-db-autosync-mode)
+  (define-key org-mode-map (kbd "M-p") #'org-roam-dailies-goto-previous-note)
+  (define-key org-mode-map (kbd "M-n") #'org-roam-dailies-goto-next-note)
+  (transient-define-prefix my/org-roam-menu ()
+    "Org Roam"
+    [("b" "Buffer"           org-roam-buffer-toggle)
+     ("t" "Dailies today"    org-roam-dailies-goto-today)
+     ("d" "Dailies date"     org-roam-dailies-goto-date)]))
 
 (use-package citar
   :ensure t
@@ -283,20 +340,30 @@
   (citar-bibliography '("~/zotero/library.bib"))
   (org-cite-global-bibliography '("~/zotero/library.bib"))
   (citar-library-paths '("~/zotero/storage"))
+  (citar-notes-paths '("~/research"))
   (org-cite-insert-processor 'citar)
   (org-cite-follow-processor 'citar)
   (org-cite-activate-processor 'citar)
   :bind
   (:map org-mode-map
-   ("C-c [" . citar-insert-citation)))
+   ("C-c [" . citar-insert-citation)
+   ("C-c ]" . citar-open-notes)))
 
-(use-package citar-denote
+(use-package citar-org-roam
   :ensure t
-  :after (citar denote)
+  :after (citar org-roam)
   :custom
-  (citar-denote-keyword "artigo")
+  (citar-org-roam-capture-template-key "r")
+  (citar-org-roam-note-title-template "${title}")
   :config
-  (citar-denote-mode))
+  (add-to-list 'org-roam-capture-templates
+               '("r" "referência" plain "%?"
+                 :target (file+head
+                          "%(concat (when citar-org-roam-subdir (concat citar-org-roam-subdir \"/\")) \"${citar-citekey}.org\")"
+                          "#+title: ${note-title}\n#+author: ${citar-author}\n#+filetags: :artigo:\n")
+                 :immediate-finish t
+                 :unnarrowed t))
+  (citar-org-roam-mode))
 
 (use-package copilot
   :ensure t
@@ -334,18 +401,27 @@
    ("C-c n" . agent-shell-new-shell)
    ("C-c g" . agent-shell-prompt-compose)
    ("C-c SPC" . agent-shell-toggle)
+   ("C-<tab>" . nil)
    :map agent-shell-diff-mode-map
    ("a" . agent-shell-diff-accept-all))
   :custom
   (agent-shell-header-style 'text)
   (agent-shell-show-welcome-message nil)
-  (agent-shell-opencode-default-model-id "opencode-go/deepseek-v4-pro/max")
   (agent-shell-preferred-agent-config 'claude-code)
+  (agent-shell-anthropic-default-model-id "sonnet")
   (agent-shell-anthropic-default-session-mode-id "default")
-  (agent-shell-anthropic-default-model-id "claude-sonnet-4-6")
-  (agent-shell-session-strategy 'new)
+  (agent-shell-session-strategy 'prompt)
   (agent-shell-activity-group-expand-by-default 'latest)
   (agent-shell-prefer-viewport-interaction nil)
+  (agent-shell-persistent-prompt-enabled nil)
+  :config
+  (setopt agent-shell-show-cost-indicator t)
+  ;; agent-shell-anthropic não expõe defcustom p/ config options; injeta effort low
+  (advice-add 'agent-shell-anthropic-make-claude-code-config :filter-return
+              (lambda (config)
+                (setf (alist-get :default-config-options config)
+                      (lambda () '(("effort" . "low"))))
+                config))
   )
 
 
@@ -370,11 +446,26 @@
   (reformatter-define ruff-format
                       :program "ruff"
                       :args '("format" "--line-length" "88" "-"))
-  (add-hook 'python-mode-hook #'ruff-format-on-save-mode))
+  (add-hook 'python-base-mode-hook #'ruff-format-on-save-mode))
 
 (use-package pyvenv
   :defer t
   :ensure t)
+
+(use-package eglot
+  :hook ((python-base-mode . eglot-ensure)
+         (eglot-managed-mode . (lambda () (eglot-inlay-hints-mode -1))))
+  :init (require 'markdown-ts-mode)
+  :custom
+  (eglot-documentation-renderer 'markdown-ts-view-mode)
+  :config
+  (setq-default eglot-workspace-configuration
+		'(:basedpyright (:analysis (:autoImportCompletions :json-false))))
+  )
+
+(use-package eldoc
+  :custom
+  (eldoc-echo-area-use-multiline-p nil))
 
 (use-package haskell-mode
   :ensure t
@@ -426,27 +517,11 @@
 
 (add-hook 'org-mode-hook #'my/org-checkbox-todo-strike-through)
 
-(defun my/org-jump-level1-narrowed (files)
-  (consult-org-heading "LEVEL=1" files)
-  (org-narrow-to-subtree)
-  (org-show-subtree))
-
-
-(defun my/jump-reunioes-luis ()
-  (interactive)
-  (my/org-jump-level1-narrowed '("~/org/orientacao.org")))
-
-(transient-define-prefix my/buffer-nav-menu ()
-  "Navegar buffers"
-  ["Find"
-   ("f" "Org Roam"           org-roam-node-find)
-   ("n" "Denote"             denote-open-or-create)
-   ("l" "Reuniões (Luís)"   my/jump-reunioes-luis)
-   ("b" "Bookmarks"          consult-bookmark)]
-  ["Buffers"
-   ("a" "Agent Shell"        agent-shell-switch-buffer)
-   ("g" "Ghostel"            ghostel-list-buffers)
-   ("G" "Ghostel projeto"    ghostel-project-list-buffers)])
-
-(global-set-key (kbd "C-c f") #'my/buffer-nav-menu)
-
+(use-package gnus
+  :custom
+  (gnus-select-method '(nnnil ""))
+  (gnus-secondary-select-methods '((nnrss "")))
+  (gnus-summary-line-format "%U%R%z%I%(%[%4L: %-23,23f%]%) %-10,10&user-date; %s\n")
+  (gnus-user-date-format-alist '((t . "%Y-%m-%d")))
+  (gnus-use-full-window nil)
+  )
