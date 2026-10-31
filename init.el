@@ -32,6 +32,7 @@
   (global-visual-line-mode t)
   (column-number-mode t)
   (apropos-sort-by-scores t)
+  (scroll-conservatively 101)
   (treesit-enabled-modes '(python-ts-mode))
 
   :config
@@ -68,16 +69,12 @@
   (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
   )
 
-(use-package modus-themes
+
+(use-package ef-themes
   :ensure t
-  :init
-  (require-theme 'modus-themes)
   :config
-  (load-theme 'modus-vivendi t)
-  :custom
-  (modus-themes-italic-constructs t)
-  (modus-themes-bold-constructs t)
-  (modus-themes-to-toggle '(modus-operandi-tinted modus-vivendi)))
+  (load-theme 'ef-dark t)
+  )
 
 (use-package doom-modeline
   :ensure t
@@ -122,7 +119,6 @@
   :ensure t
   :bind
   (("C-c j"       . consult-outline)
-   ("C-c m"       . consult-line-multi)
    ("C-x j"       . consult-imenu)
    ("C-x p b"     . consult-project-buffer)
    ("C-x b"       . consult-buffer)
@@ -190,7 +186,6 @@
 
 (use-package consult-ghostel
     :ensure t
-    :after (ghostel consult)
     :demand t
     :config (consult-ghostel-mode)
     :bind (("C-x m" . consult-ghostel)
@@ -198,6 +193,12 @@
            ("m" . consult-ghostel-project)
            :map ghostel-semi-char-mode-map
            ("C-c h" . consult-ghostel-history)))
+
+(use-package remember
+  :ensure nil
+  :bind
+  (("C-c k" . remember)
+   ("C-c l" . remember-notes)))
 
 (use-package org
   :hook ((org-mode          . org-indent-mode)
@@ -214,11 +215,10 @@
   (org-directory "~/org")
   (org-agenda-files '("~/org/todo.org" "~/org/agenda.org"))
   (org-capture-templates
-   '(("t" "Tarefa" entry (file+olp "~/org/todo.org" "Inbox")
+   '(("k" "Tarefa" entry (file+olp "~/org/todo.org" "Inbox")
       "* TODO %?"
       :empty-lines 1)
-     ("a" "Agenda" entry (file "~/org/agenda.org")
-      "* %?\n%^T")))
+     ))
   (org-refile-targets '((("~/org/todo.org") :maxlevel . 1)))
   (org-refile-use-outline-path 'file)
   (org-outline-path-complete-in-steps nil)
@@ -226,10 +226,17 @@
   (org-log-into-drawer t)
   (org-agenda-todo-ignore-scheduled 'future)
   (org-agenda-custom-commands
-   '(("a" "Hoje"
-      ((agenda ""))
-      ((org-agenda-span 'day)
-       (org-agenda-clockreport-mode t)))
+   '(("a" "Hoje + TODOs"
+      ((agenda ""
+               ((org-agenda-span 'day)
+                (org-agenda-overriding-header "Agenda")))
+       (todo "PROG"
+             ((org-agenda-overriding-header "Em progresso")))
+       (todo "TODO"
+             ((org-agenda-overriding-header "Backlog")
+              ;; evita repetir o que já aparece na agenda de hoje
+              (org-agenda-todo-ignore-scheduled 'all))))
+      ((org-agenda-clockreport-mode t)))
      ("t" "Backlog"
       ((todo "TODO"))
       nil)))
@@ -244,6 +251,15 @@
    '((sequence "TODO(t)" "PROG(p)" "|" "DONE(d)")))
   (org-enforce-todo-dependencies t)
   (org-enforce-todo-checkbox-dependencies t)
+  (org-agenda-dim-blocked-tasks nil)
+  ;; limiares calibrados para org-deadline-warning-days = 40 (custom.el)
+  (org-agenda-deadline-faces
+   '((1.01 . (:inherit error :underline t))       ; vencido
+     (1.0  . org-imminent-deadline)               ; hoje
+     (0.97 . org-upcoming-deadline)               ; amanhã
+     (0.82 . (:foreground "#d1843f"))             ; esta semana (laranja)
+     (0.64 . (:inherit warning :weight normal))   ; semana que vem (amarelo)
+     (0.0  . shadow)))                            ; mais de 2 semanas
   (org-default-priority ?C)
   (org-hide-drawer-startup t)
   (org-agenda-clockreport-parameter-plist '(:scope agenda-with-archives :maxlevel 1 :fileskip0 t))
@@ -393,7 +409,7 @@
   ((claude-agent-acp . "npm install -g @agentclientprotocol/claude-agent-acp"))
   :bind
   (
-   ("C-c  b" . agent-shell-switch-buffer)
+   ("C-c  m" . agent-shell-switch-buffer)
    ("C-c SPC" . agent-shell)
    ("C-c s o" . agent-shell-opencode-start-agent)
    ("C-c s c" . agent-shell-anthropic-start-claude-code)
@@ -408,7 +424,7 @@
   (agent-shell-header-style 'text)
   (agent-shell-show-welcome-message nil)
   (agent-shell-preferred-agent-config 'claude-code)
-  (agent-shell-anthropic-default-model-id "sonnet")
+  (agent-shell-anthropic-default-model-id "opus")
   (agent-shell-anthropic-default-session-mode-id "default")
   (agent-shell-session-strategy 'prompt)
   (agent-shell-activity-group-expand-by-default 'latest)
@@ -416,12 +432,6 @@
   (agent-shell-persistent-prompt-enabled nil)
   :config
   (setopt agent-shell-show-cost-indicator t)
-  ;; agent-shell-anthropic não expõe defcustom p/ config options; injeta effort low
-  (advice-add 'agent-shell-anthropic-make-claude-code-config :filter-return
-              (lambda (config)
-                (setf (alist-get :default-config-options config)
-                      (lambda () '(("effort" . "low"))))
-                config))
   )
 
 
