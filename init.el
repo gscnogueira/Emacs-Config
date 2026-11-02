@@ -252,6 +252,7 @@
   (org-enforce-todo-dependencies t)
   (org-enforce-todo-checkbox-dependencies t)
   (org-agenda-dim-blocked-tasks nil)
+  (org-agenda-follow-indirect t)
   ;; limiares calibrados para org-deadline-warning-days = 40 (custom.el)
   (org-agenda-deadline-faces
    '((1.01 . (:inherit error :underline t))       ; vencido
