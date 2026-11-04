@@ -106,6 +106,12 @@
   :ensure t
   :init
   (vertico-mode t)
+  (vertico-multiform-mode t)
+  :custom
+  ;; preserva a ordem de Effort_ALL (1h 4h 1d 2d) em vez de ordenar alfabeticamente
+  (vertico-multiform-commands
+   '((org-set-effort (vertico-sort-function . nil))
+     (org-agenda-set-effort (vertico-sort-function . nil))))
   :bind
   (:map vertico-map
 	("C-<backspace>" . vertico-directory-delete-word)))
@@ -244,7 +250,7 @@
   (org-agenda-use-time-grid nil)
   (org-agenda-prefix-format
    '((agenda  . " %i %-12:c%?-12t % s %-6e")
-     (todo    . " %i %-12:c% s")
+     (todo    . " %i %-12:c% s %-6e")
      (tags    . " %i %-12:c")
      (search  . " %i %-12:c %-6e")))
   (org-todo-keywords
@@ -265,6 +271,16 @@
   (org-hide-drawer-startup t)
   (org-agenda-clockreport-parameter-plist '(:scope agenda-with-archives :maxlevel 1 :fileskip0 t))
   (org-clock-mode-line-total 'today)
+  ;; estimativas grosseiras: acima de 2d, quebrar a tarefa
+  (org-global-properties '(("Effort_ALL" . "1h 4h 1d 2d")))
+  (org-duration-units
+   `(("min" . 1)
+     ("h"   . 60)
+     ("d"   . ,(* 60 8))        ; dia de trabalho = 8h
+     ("w"   . ,(* 60 8 5))      ; semana = 5 dias
+     ("m"   . ,(* 60 8 5 4))
+     ("y"   . ,(* 60 8 5 4 10))))
+  (org-duration-format 'h:mm)   ; clock continua em horas, não em dias de 8h
   :config
   (require 'org-tempo)
   (add-to-list 'org-tempo-keywords-alist '("t" . "title"))
