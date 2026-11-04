@@ -257,7 +257,7 @@
    '((sequence "TODO(t)" "PROG(p)" "|" "DONE(d)")))
   (org-enforce-todo-dependencies t)
   (org-enforce-todo-checkbox-dependencies t)
-  (org-agenda-dim-blocked-tasks nil)
+  (org-agenda-dim-blocked-tasks t)
   (org-agenda-follow-indirect t)
   ;; limiares calibrados para org-deadline-warning-days = 40 (custom.el)
   (org-agenda-deadline-faces
@@ -267,7 +267,6 @@
      (0.82 . (:foreground "#d1843f"))             ; esta semana (laranja)
      (0.64 . (:inherit warning :weight normal))   ; semana que vem (amarelo)
      (0.0  . shadow)))                            ; mais de 2 semanas
-  (org-default-priority ?C)
   (org-hide-drawer-startup t)
   (org-agenda-clockreport-parameter-plist '(:scope agenda-with-archives :maxlevel 1 :fileskip0 t))
   (org-clock-mode-line-total 'today)
